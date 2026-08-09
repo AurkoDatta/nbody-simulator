@@ -11,5 +11,9 @@ class Config:
 
     MONGO_URI = os.environ.get('MONGO_URI', 'mongodb://localhost:27017/nbody_simulator')
     MONGO_DB_NAME = os.environ.get('MONGO_DB_NAME', 'nbody_simulator')
-    JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY', 'dev-secret-change-me')
+    # Fallback is only used when JWT_SECRET_KEY isn't set (e.g. running
+    # tests without a .env file) -- padded past 32 bytes so it doesn't
+    # trigger jwt's InsecureKeyLengthWarning; production deployments must
+    # still set a real secret via the environment.
+    JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY', 'dev-secret-change-me-0123456789abcdef')
     FLASK_ENV = os.environ.get('FLASK_ENV', 'production')
