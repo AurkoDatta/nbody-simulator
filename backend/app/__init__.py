@@ -6,6 +6,7 @@ from flask import Flask
 from app.config import Config
 from app.extensions import cors, init_mongo, jwt
 from app.routes.preset_routes import preset_bp
+from app.routes.simulation_routes import simulation_bp
 from app.utils.errors import register_error_handlers
 
 load_dotenv()
@@ -29,5 +30,6 @@ def create_app(testing=False):
     register_error_handlers(app)
 
     app.register_blueprint(preset_bp, url_prefix='/api')
+    app.register_blueprint(simulation_bp, url_prefix='/api/simulations')
 
     return app
