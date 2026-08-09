@@ -1,0 +1,16 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-void text-star font-body antialiased;
+  }
+
+  /* Numeric telemetry (mass, coordinates, velocity, energy, time) always
+     renders in the mono face, right-aligned like an instrument readout --
+     this is the app's core typographic signature, not a stray utility. */
+  .readout {
+    @apply font-mono tabular-nums text-right;
+  }
+}
