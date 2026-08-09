@@ -1,47 +1,48 @@
-"""Simulation CRUD endpoints.
+"""Simulation CRUD endpoints, scoped to the authenticated user.
 
-NOTE: authentication is added in a later phase (see auth_routes.py / the
-Flask-JWT-Extended setup). Until then, every request is attributed to a
-fixed placeholder user id so these endpoints -- and their ownership-
-scoped queries -- can be built and tested end-to-end now. Wiring in real
-auth later is a matter of swapping where this id comes from (a JWT
-claim instead of a constant), not rewriting the service layer.
+Every route requires a valid JWT; the user id embedded in that token is
+what simulation_service uses to filter/own each document, so one user
+can never see, rename, or delete another user's simulations.
 """
 
 from flask import Blueprint, jsonify, request
+from flask_jwt_extended import get_jwt_identity, jwt_required
 
 from app.services import simulation_service
 
 simulation_bp = Blueprint('simulations', __name__)
 
-_PLACEHOLDER_USER_ID = 'dev-user'
-
 
 @simulation_bp.route('', methods=['POST'])
+@jwt_required()
 def create_simulation():
-    result = simulation_service.create_simulation(request.get_json(force=True) or {}, _PLACEHOLDER_USER_ID)
+    result = simulation_service.create_simulation(request.get_json(force=True) or {}, get_jwt_identity())
     return jsonify(result), 201
 
 
 @simulation_bp.route('', methods=['GET'])
+@jwt_required()
 def list_simulations():
-    return jsonify(simulation_service.list_simulations(_PLACEHOLDER_USER_ID))
+    return jsonify(simulation_service.list_simulations(get_jwt_identity()))
 
 
 @simulation_bp.route('/<simulation_id>', methods=['GET'])
+@jwt_required()
 def get_simulation(simulation_id):
-    return jsonify(simulation_service.get_simulation(simulation_id, _PLACEHOLDER_USER_ID))
+    return jsonify(simulation_service.get_simulation(simulation_id, get_jwt_identity()))
 
 
 @simulation_bp.route('/<simulation_id>', methods=['PUT'])
+@jwt_required()
 def update_simulation(simulation_id):
     result = simulation_service.update_simulation(
-        simulation_id, _PLACEHOLDER_USER_ID, request.get_json(force=True) or {}
+        simulation_id, get_jwt_identity(), request.get_json(force=True) or {}
     )
     return jsonify(result)
 
 
 @simulation_bp.route('/<simulation_id>', methods=['DELETE'])
+@jwt_required()
 def delete_simulation(simulation_id):
-    simulation_service.delete_simulation(simulation_id, _PLACEHOLDER_USER_ID)
+    simulation_service.delete_simulation(simulation_id, get_jwt_identity())
     return '', 204
